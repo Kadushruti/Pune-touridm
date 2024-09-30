@@ -17,7 +17,6 @@ else
 include('include/head.php');
 ?>
     </head>
-
     <body class="fixed">
         <!-- Page Loader -->
         <div class="page-loader-wrapper">
@@ -53,12 +52,12 @@ include('include/header.php');
                         <nav aria-label="breadcrumb" class="col-sm-4 order-sm-last mb-3 mb-sm-0 p-0 ">
                             <ol class="breadcrumb d-inline-flex font-weight-600 fs-13 bg-white mb-0 float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Contact Messages</li>
+                                <li class="breadcrumb-item active">Manage Facilities</li>
                             </ol>
                         </nav>
                         <div class="col-sm-8 header-title p-0">
                             <div class="media">
-                                <div class="header-icon text-success mr-3"><i class="fas fa-envelope-open-text"></i></div>
+                                <div class="header-icon text-success mr-3"><i class="fas fa-wrench"></i></div>
                             </div>
                         </div>
                     </div>
@@ -70,35 +69,35 @@ include('include/header.php');
                                     <div class="card-body">
                                         <div class="table-responsive">
                                             <table class="table display table-bordered table-striped table-hover basic">
-                                                <thead >
+                                                <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Name</th>
-                                                        <th>Email</th>
-                                                        <th>Message</th>
-                                                        <th>Delete</th>
+                                                        <th>Name</th> 
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php 
-                                                    $results = mysqli_query($conn, "SELECT * FROM tbl_contact");
-                                    if(mysqli_num_rows($result) > 0)
+                                                        $sql = "SELECT * FROM tbl_facility";
+                                                        $result = mysqli_query($conn,$sql);
+                                                        if(mysqli_num_rows($result) > 0)
                                                         {
                                                             $i = 1;
-                                    while ($row = mysqli_fetch_array($results)) { ?>
-                                                    <tr class="text-capitalize">
-                                                         <td><?= $i;?></td>
-                                                      <td><?php echo $row['name']; ?>
-                                                        </td>
-                                                        <td ><?php echo $row['email']; ?></td>
-                                                        
-                        <td><?php echo $row['message']; ?></td>
-<td class="text-center">
-<a onclick="delete_message('<?= $row['id'];?>');" data-toggle="tooltip" data-placement="bottom" title="Delete Message" class="btn btn-danger"><i class="fa fa-trash text-white" ></i></a>
-                        </td>
+                                                            while($row = mysqli_fetch_array($result))
+                                                            {
+                                                            ?>
+                                                    <tr class="text-capitalize">  
+                                                        <td><?= $i;?></td>  
+                                                        <td><?php echo $row['facility_name']; ?></td>
+                                                        <td>
+                                                            <a href="editfacility.php?editfacility=<?php echo $row['facility_id']; ?>" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Edit Facility"><i class="fa fa-pencil-alt"></i></a>
+                                                            <a onclick="delete_facility('<?= $row['facility_id'];?>');" data-toggle="tooltip" data-placement="bottom" title="Delete Facility" class="btn btn-danger"><i class="fa fa-trash text-white" ></i></a>
+                                                        </td> 
                                                     </tr>
-                                                     $i++;
-                                                    <?php } }
+                                                   <?php
+                                                        $i++;
+                                                        }
+                                                    }
                                                     ?>
                                                 </tbody>
                                             </table>
@@ -120,15 +119,15 @@ include('include/footer.php');
 include('include/script.php');
 ?>
  <script type="text/javascript">
-function delete_message(deletemessage)
+function delete_facility(deletefacility)
 {
     swal({title: 'Are you sure..!',
-    text: "Do You Want to Delete Message?",
+    text: "Do You Want to Delete Facility?",
     type: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Confirm!'},
    function(){ 
-       window.location = 'contact.php?deletemessage='+deletemessage;
+       window.location = 'managefacilites.php?deletefacility='+deletefacility;
    }
 );   
 }
@@ -137,24 +136,23 @@ function delete_message(deletemessage)
 
 </html>
 <?php
-if(isset($_GET['deletemessage']))
+if(isset($_GET['deletefacility']))
     
 {
-    $id = $_GET['deletemessage'];
+    $facility_id = $_GET['deletefacility'];
 
-    $sql1 = "DELETE FROM tbl_contact WHERE id=$id";
+    $sql1 = "DELETE FROM tbl_facility WHERE facility_id=$facility_id";
     $success1 = mysqli_query($conn,$sql1);
     if($success1)
     {
         ?> 
         <script type="text/javascript">
-            swal({title: "Success", text: "Message Delete Successfully..!", type: "success"},
+            swal({title: "Success", text: "Facility Delete Successfully..!", type: "success"},
                function(){ 
-                   window.location = "contact.php";
+                   window.location = "managefacilites.php";
                }
             );
         </script>
-
 <?php
     }
     else

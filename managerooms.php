@@ -17,7 +17,14 @@ else
 include('include/head.php');
 ?>
     </head>
-
+<style type="text/css">
+.ellipsis{
+    max-width: 200px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+</style>
     <body class="fixed">
         <!-- Page Loader -->
         <div class="page-loader-wrapper">
@@ -53,12 +60,12 @@ include('include/header.php');
                         <nav aria-label="breadcrumb" class="col-sm-4 order-sm-last mb-3 mb-sm-0 p-0 ">
                             <ol class="breadcrumb d-inline-flex font-weight-600 fs-13 bg-white mb-0 float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Contact Messages</li>
+                                <li class="breadcrumb-item active">Manage Rooms</li>
                             </ol>
                         </nav>
                         <div class="col-sm-8 header-title p-0">
                             <div class="media">
-                                <div class="header-icon text-success mr-3"><i class="fas fa-envelope-open-text"></i></div>
+                                <div class="header-icon text-success mr-3"><i class="fas fa-bed"></i></div>
                             </div>
                         </div>
                     </div>
@@ -70,35 +77,43 @@ include('include/header.php');
                                     <div class="card-body">
                                         <div class="table-responsive">
                                             <table class="table display table-bordered table-striped table-hover basic">
-                                                <thead >
+                                                <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Name</th>
-                                                        <th>Email</th>
-                                                        <th>Message</th>
-                                                        <th>Delete</th>
+                                                        <th>Name</th> 
+                                                        <th>Price</th>
+                                                        <th>Max People</th>
+                                                        <th>Description</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php 
-                                                    $results = mysqli_query($conn, "SELECT * FROM tbl_contact");
-                                    if(mysqli_num_rows($result) > 0)
+                                                        $sql = "SELECT * FROM tbl_rooms";
+                                                        $result = mysqli_query($conn,$sql);
+                                                        if(mysqli_num_rows($result) > 0)
                                                         {
                                                             $i = 1;
-                                    while ($row = mysqli_fetch_array($results)) { ?>
-                                                    <tr class="text-capitalize">
-                                                         <td><?= $i;?></td>
-                                                      <td><?php echo $row['name']; ?>
-                                                        </td>
-                                                        <td ><?php echo $row['email']; ?></td>
-                                                        
-                        <td><?php echo $row['message']; ?></td>
-<td class="text-center">
-<a onclick="delete_message('<?= $row['id'];?>');" data-toggle="tooltip" data-placement="bottom" title="Delete Message" class="btn btn-danger"><i class="fa fa-trash text-white" ></i></a>
-                        </td>
+                                                            while($row = mysqli_fetch_array($result))
+                                                            {
+                                                            ?>
+                                                    <tr class="text-capitalize">  
+                                                        <td><?= $i;?></td>  
+                                                        <td><?php echo $row['name']; ?></td>
+                                                        <td><?php echo $row['price']; ?></td>
+                                                        <td><?php echo $row['max_people']; ?></td>
+                                                        <td class="ellipsis"><?php echo $row['description']; ?></td>
+                                                        <td>
+                                                            <a href="editroom.php?editroom=<?php echo $row['id']; ?>" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Edit Room"><i class="fas fa-edit"></i></a>
+                                                            <a href="roomcover.php?roomcover=<?php echo $row['id']; ?>" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Room Cover Image"><i class="fas fa-image"></i></a>
+                                                            <a href="roomgallery.php?roomgallery=<?php echo $row['id']; ?>" class="btn btn-warning text-white" data-toggle="tooltip" data-placement="bottom" title="Room Image Gallery"><i class="fas fa-images"></i></a>
+                                                            <a onclick="delete_room('<?= $row['id'];?>');" data-toggle="tooltip" data-placement="bottom" title="Delete Room" class="btn btn-danger"><i class="fas fa-trash-alt text-white" ></i></a>
+                                                        </td> 
                                                     </tr>
-                                                     $i++;
-                                                    <?php } }
+                                                   <?php
+                                                        $i++;
+                                                        }
+                                                    }
                                                     ?>
                                                 </tbody>
                                             </table>
@@ -120,15 +135,15 @@ include('include/footer.php');
 include('include/script.php');
 ?>
  <script type="text/javascript">
-function delete_message(deletemessage)
+function delete_room(deleteroom)
 {
     swal({title: 'Are you sure..!',
-    text: "Do You Want to Delete Message?",
+    text: "Do You Want to Delete Room?",
     type: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Confirm!'},
    function(){ 
-       window.location = 'contact.php?deletemessage='+deletemessage;
+       window.location = 'managerooms.php?deleteroom='+deleteroom;
    }
 );   
 }
@@ -137,24 +152,25 @@ function delete_message(deletemessage)
 
 </html>
 <?php
-if(isset($_GET['deletemessage']))
+if(isset($_GET['deleteroom']))
     
 {
-    $id = $_GET['deletemessage'];
+    $id = $_GET['deleteroom'];
 
-    $sql1 = "DELETE FROM tbl_contact WHERE id=$id";
+    $sql1 = "DELETE FROM tbl_rooms WHERE id=$id";
     $success1 = mysqli_query($conn,$sql1);
     if($success1)
     {
+        $sql2 = "DELETE FROM tbl_rooms_gallery WHERE room_id=$id";
+        $success2 = mysqli_query($conn,$sql2);
         ?> 
         <script type="text/javascript">
-            swal({title: "Success", text: "Message Delete Successfully..!", type: "success"},
+            swal({title: "Success", text: "Room Delete Successfully..!", type: "success"},
                function(){ 
-                   window.location = "contact.php";
+                   window.location = "managerooms.php";
                }
             );
         </script>
-
 <?php
     }
     else
